@@ -25,4 +25,4 @@ Click on Publish to publish the Runbook
 
 Click on Schedule to create a new schedule to run hourly and reoccurring, I set mine to run in the middle of the hour @ :30
 
-Use Azure Storage Explorer to examine the data in the Storage Tables 
+Use Azure Storage Explorer to examine the data in the Storage Tables - https://azure.microsoft.com/en-us/features/storage-explorer/
