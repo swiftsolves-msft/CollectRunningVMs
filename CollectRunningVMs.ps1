@@ -45,11 +45,16 @@ $saContext = (Get-AzureRmStorageAccount -ResourceGroupName $resourceGroup -Name 
 
 $table = Get-AzureStorageTable -Name $tableName -Context $saContext
 
+$Subs = Get-AzureRMSubscription
+
+foreach($Sub in $Subs) {
+
+Set-AzureRMContext -Subscription $Sub.id
+
 $VMs = Get-AzureRmVM -Status | Where-Object { $_.PowerState -eq "VM running" }
 
-
 foreach($VM in $VMs) {
-
+    
 $resource = (Get-AzureRmResource -ResourceName $VM.Name -ResourceType "Microsoft.Compute/virtualMachines" -ResourceGroupName $VM.ResourceGroupName -ApiVersion 2017-03-30).properties.storageProfile | Select imageReference
 
 $vmhw = (Get-AzureRmVM -ResourceGroupName $VM.ResourceGroupName -Name $VM.name).hardwareProfile.VmSize
@@ -62,6 +67,8 @@ $offer = $resource.psobject.properties.value.offer
 
 $sku = $resource.psobject.properties.value.sku
 
-Add-StorageTableRow -table $table -partitionKey $VM.name -rowKey ([guid]::NewGuid().tostring()) -property @{"DateMM"=$datem;"DateDD"=$dated;"DateYYYY"=$datey;"DateHH"=$dateh;"ResourceGroupName"=$VM.ResourceGroupName;"Location"=$VM.Location;"VmSize"=$VM.HardwareProfile.VMSize;"Publisher"=$publisher;"Offer"=$offer;"Sku"=$sku;"VMCores"=$vmhwcore.NumberOfCores}
+Add-StorageTableRow -table $table -partitionKey $VM.name -rowKey ([guid]::NewGuid().tostring()) -property @{"DateMM"=$datem;"DateDD"=$dated;"DateYYYY"=$datey;"DateHH"=$dateh;"ResourceGroupName"=$VM.ResourceGroupName;"Location"=$VM.Location;"VmSize"=$VM.HardwareProfile.VMSize;"Publisher"=$publisher;"Offer"=$offer;"Sku"=$sku;"VMCores"=$vmhwcore.NumberOfCores;"Subscription"=$Sub.Name}
+
+}
 
 }
